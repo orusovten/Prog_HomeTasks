@@ -7,7 +7,7 @@ using std::cout;
 
 class Graph {
 public:
-    Graph(int Size) {
+    explicit Graph(int Size) {
         size = Size;
         for (int i = 0; i < size; ++i) {
             std::vector<int> VertexEdges;
@@ -17,7 +17,7 @@ public:
     void AddEdge(int from, int to);
     const std::vector<int>& GetNextVertexs(int from) const;
     void Invert();
-    int Size();
+    int Size() const;
 private:
     int size; // кол-во вершин
     std::vector<std::vector<int>> EdgesList; // вектор смежности
@@ -41,11 +41,11 @@ void Graph::Invert() {
     EdgesList = InvertingEdgesList;
 }
 
-int Graph::Size() {
+int Graph::Size() const {
     return size;
 }
 
-void TopSort(Graph& graph, int start_vertex, std::vector<int>& sorted_vertex, int& t, std::vector<int>& flags) {
+void TopSort(const Graph& graph, int start_vertex, std::vector<int>& sorted_vertex, int& t, std::vector<int>& flags) {
     std::stack<int> stack;
     stack.push(start_vertex);
     flags[start_vertex] = 1;
@@ -70,7 +70,7 @@ void TopSort(Graph& graph, int start_vertex, std::vector<int>& sorted_vertex, in
 }
 
 // поиск компонент сильной связности(strong connectivity components)
-std::vector<int> SCC_Search(Graph& graph, int start_vertex, std::vector<int>& flags, std::vector<int>& colors, int color) {
+std::vector<int> SCC_Search(const Graph& graph, int start_vertex, std::vector<int>& flags, std::vector<int>& colors, int color) {
     std::stack<int> stack;
     std::vector<int> scc;
     stack.push(start_vertex);
