@@ -7,7 +7,7 @@ using std::cout;
 
 class Graph {
 public:
-    Graph(int Size) {
+    explicit Graph(int Size) {
         size = Size;
         for (int i = 0; i < size; ++i) {
             std::vector<int> VertexEdges;
@@ -16,7 +16,7 @@ public:
     }
     void AddEdge(int from, int to);
     const std::vector<int>& GetNextVertexs(int from) const;
-    int Size();
+    int Size() const;
 private:
     int size; // кол-во вершин
     std::vector<std::vector<int>> EdgesList; // вектор смежности
@@ -30,11 +30,11 @@ const std::vector<int>& Graph::GetNextVertexs(int from) const {
     return EdgesList[from];
 }
 
-int Graph::Size() {
+int Graph::Size() const {
     return size;
 }
 
-bool TopSort(Graph& graph, int start_vertex, std::vector<int>& colors, std::vector<int>& vec_for_yes) {
+bool TopSort(const Graph& graph, int start_vertex, std::vector<int>& colors, std::vector<int>& vec_for_yes) {
     std::stack<int> stack;
     stack.push(start_vertex);
     colors[start_vertex] = 1;
@@ -61,7 +61,7 @@ bool TopSort(Graph& graph, int start_vertex, std::vector<int>& colors, std::vect
     return true;
 }
 
-std::string solution(std::vector<int>& vec_for_yes, Graph& graph) {
+std::string solution(std::vector<int>& vec_for_yes, const Graph& graph) {
     std::vector<int> colors(graph.Size());
     for (int i = 0; i < graph.Size(); ++i) {
         colors[i] = 0;
