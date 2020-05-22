@@ -6,18 +6,34 @@
 #include <vector>
 #include <set>
 
-int get(int vertex, std::vector<int>& parent) { // получить корень
+class DSU {
+private:
+	std::vector<int> parent;
+	std::vector<int> size;
+public:
+	explicit DSU(int n) {
+		parent = std::vector<int>(n);
+		for (int i = 0; i < n; ++i) {
+			parent[i] = i;
+		}
+		size = std::vector<int>(n, 1);
+	}
+	int get(int vertex);
+	void unite(int leftVertex, int rightVertex);
+};
+
+int DSU::get(int vertex) { // получить корень
 	if (parent[vertex] == vertex) {
 		return vertex;
 	}
-	int x = get(parent[vertex], parent);
+	int x = get(parent[vertex]);
 	parent[vertex] = x;
 	return x;
 }
 
-void unite(int leftVertex, int rightVertex, std::vector<int>& parent, std::vector<int>& size) {
-	int left = get(leftVertex, parent);
-	int right = get(rightVertex, parent);
+void DSU::unite(int leftVertex, int rightVertex) {
+	int left = get(leftVertex);
+	int right = get(rightVertex);
 	if (size[left] < size[right]) {
 		parent[left] = right;
 		size[right] += size[left];
@@ -37,17 +53,13 @@ int Kruskal(int N, int M) {
 		std::cin >> a >> b >> weight;
 		priority.insert(std::make_pair(weight, std::make_pair(a - 1, b - 1)));
 	}
-	std::vector<int> parent(N);
-	for (int i = 0; i < N; ++i) {
-		parent[i] = i;
-	}
-	std::vector<int> size(N, 1);
+	DSU dsu(N);
 	int sum = 0;
 	while (!priority.empty()) {
 		auto current = *priority.begin();
 		priority.erase(current);
-		if (get(current.second.first, parent) != get(current.second.second, parent)) {
-			unite(current.second.first, current.second.second, parent, size);
+		if (dsu.get(current.second.first) != dsu.get(current.second.second)) {
+			dsu.unite(current.second.first, current.second.second);
 			sum += current.first;
 		}
 	}
