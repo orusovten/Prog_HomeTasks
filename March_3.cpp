@@ -6,11 +6,11 @@
 
 #include <iostream>
 #include <vector>
+#include <set>
 
 class Graph {
 public:
-    explicit Graph(int Size) {
-        size = Size;
+    explicit Graph(int size) {
         for (int i = 0; i < size; ++i) {
             std::vector<std::pair<int, double>> VertexEdges;
             EdgesList.push_back(VertexEdges);
@@ -20,7 +20,6 @@ public:
     const std::vector<std::pair<int, double>>& GetNextVertexs(int from) const;
     int Size() const;
 private:
-    int size; // кол-во вершин
     std::vector<std::vector<std::pair<int, double>>> EdgesList; // вектор смежности
 };
 
@@ -33,27 +32,33 @@ const std::vector<std::pair<int, double>>& Graph::GetNextVertexs(int from) const
 }
 
 int Graph::Size() const{
-    return size;
+    return EdgesList.size();
 }
 
-void Ford_Bellman(const Graph& graph, int start, std::vector<double>& dp) {
+void Dijkstra(const Graph& graph, int start, std::vector<double>& dp) {
+    std::vector<bool> visited(graph.Size(), false);
+    std::set<std::pair<double, int>, std::greater<std::pair<double, int>>> priority;
     dp[start] = 1;
-    for (int l = 0; l < graph.Size() - 1; ++l) {
-        for (int i = 0; i < graph.Size(); ++i) {
-            std::vector<std::pair<int, double>> NextVertexs = graph.GetNextVertexs(i);
-            for (auto vertex : NextVertexs) {
-                if (dp[vertex.first] < vertex.second * dp[i]) {
-                    dp[vertex.first] = vertex.second * dp[i];
-                }
+    priority.insert(std::make_pair(1., start));
+    while (!priority.empty()) {
+        auto current = *priority.begin();
+        priority.erase(current);
+        auto NextVertexs = graph.GetNextVertexs(current.second);
+        for (auto vertex : NextVertexs) {
+            if (!visited[vertex.first] && current.first * vertex.second > dp[vertex.first]) {
+                priority.erase(std::make_pair(dp[vertex.first], vertex.first));
+                dp[vertex.first] = current.first * vertex.second;
+                priority.insert(std::make_pair(dp[vertex.first], vertex.first));
             }
         }
+        visited[current.second] = true;
     }
 }
 
 double solution(const Graph& graph, int start, int end) {
     // сведем задачу к поиску пути с наиб произведением
     std::vector<double> dp(graph.Size(), 0);
-    Ford_Bellman(graph, start, dp);
+    Dijkstra(graph, start, dp);
     return 1 - dp[end];
 }
 
